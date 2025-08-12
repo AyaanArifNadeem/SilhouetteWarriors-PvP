@@ -1,17 +1,19 @@
 #include<iostream>
 #include<raylib.h>
 #include<cmath>
+#include "player.hpp"
 using namespace std;
 
 int main(){
     const int ScreenWidth = 1920, ScreenHeight = 1080;
-    Rectangle player = {(2500/2)-200, 450, 200,450};
-    Rectangle enemy =  {(2500/2)-200, 450, 200,450};
+    Rectangle enemy =  {(2500/2)-200, 450, 200, 450};
 
     InitWindow(ScreenWidth,ScreenHeight,"SilhouetteWarriors-PvP");
 
+    player p1; 
+
     Camera2D camera = { 0 };
-    camera.target = (Vector2){ ((player.x + enemy.x+200)/2.0f), ((player.y + enemy.y)/2.0f) };
+    camera.target = (Vector2){ ((p1.position.x + enemy.x+200)/2.0f), ((p1.position.y + enemy.y)/2.0f) };
     camera.offset = (Vector2){ ScreenWidth/2.0f, ScreenHeight/2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
@@ -31,6 +33,7 @@ int main(){
     float scrollingfront1 = 0.0f;
     float scrollingfront2 = 0.0f;
     float scrollingfront3 = 0.0f;
+    float flooroffset = 0.0f;
 
     while(!WindowShouldClose()){
         
@@ -45,9 +48,13 @@ int main(){
 
 
         //Camera Work
-        camera.target = (Vector2){ ((player.x + enemy.x+200)/2.0f), ((player.y + enemy.y)/2.0f) };
-        if(fabs(player.x-enemy.x) > 1720){camera.zoom = 1.646 - 0.000375*(fabs(player.x-enemy.x));}
-        else{camera.zoom = 1;}
+        camera.target = (Vector2){ ((p1.position.x + enemy.x+200)/2.0f), ((p1.position.y + enemy.y)/2.0f) };
+        if(fabs(p1.position.x-enemy.x) > 1720){
+            camera.zoom = 1.646 - 0.000375*(fabs(p1.position.x-enemy.x));
+            flooroffset =  ((fabs(p1.position.x-enemy.x))-1720)*0.160256f;
+        }
+        else{camera.zoom = 1.0f; flooroffset = 0.0f;}
+
         if (camera.zoom > 1.0f) camera.zoom = 1.0f;
         else if (camera.zoom < 0.7f) camera.zoom = 0.7f;
 
@@ -56,30 +63,26 @@ int main(){
         //Parallex Effect Code
         //Placeholder Characters Control
         if(enemy.x < 0) enemy.x=0;
-        if(player.x < 0) player.x=0;
         if(enemy.x > 2500) enemy.x=2500;
-        if(player.x > 2500) player.x=2500;
 
-        if (IsKeyDown(KEY_RIGHT) && player.x < 2500){ 
-            player.x += 15;
+        if (IsKeyDown(KEY_D) && p1.position.x < 2500){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if (IsKeyDown(KEY_LEFT) && player.x > 0){ 
-            player.x -= 15;
+        else if (IsKeyDown(KEY_A) && p1.position.x > 0){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
-        if (IsKeyDown(KEY_D) && enemy.x < 2500){ 
+        if (IsKeyDown(KEY_RIGHT) && enemy.x < 2500){ 
             enemy.x += 15;
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if (IsKeyDown(KEY_A) && enemy.x > 0){ 
+        else if (IsKeyDown(KEY_LEFT) && enemy.x > 0){ 
             enemy.x -= 15;
             scrollingfront3 += 2;
             scrollingfront2 += 1;
@@ -87,7 +90,7 @@ int main(){
         }
 
        
-
+        p1.update();
         
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -104,15 +107,16 @@ int main(){
         DrawTexturePro(g3,(Rectangle){0, 0, (float)g3.width, (float)g3.height},(Rectangle){-350+scrollingfront3, -100, ScreenWidth+1300, ScreenHeight},(Vector2){0, 0},0.0f,WHITE);
 
         //Live Player Positon Information
-        DrawText(TextFormat("Pos: %f", player.x), 100, 100, 50, RED);
+        DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
         DrawText(TextFormat("Pos: %f", enemy.x), 100, 200, 50, BLUE);
+        DrawRectangle(-1000, 975.0f-(flooroffset), 5000, 3000, BLACK);
+
 
 
         BeginMode2D(camera);   
 
-            DrawRectangleRec(player, RED);
             DrawRectangleRec(enemy, BLUE);
-            DrawRectangle(-1000, (player.y+player.height-20), 5000, 3000, BLACK);
+            p1.draw();
 
         EndMode2D();
 
