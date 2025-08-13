@@ -3,10 +3,13 @@
 
 class player{
 private:
-    Texture2D image;
+    Rectangle hitbox;
+    Rectangle frameRec;
+
+    Texture2D image,running_anim;
     Vector2 speed;
-    float p_dmg, k_dmg, scale, groundY;
-    bool facingRight, is_attacking, is_blocking, is_grounded;
+    float p_dmg, k_dmg, scale, groundY, keyframe;
+    bool facingRight, is_attacking, is_blocking, is_grounded, is_moving;
 
     const float gravity= 600.0f;
     const float acceleration = 500.0f;
@@ -14,10 +17,12 @@ private:
     const float jumpVelocity = -300.0f;
     float moveSpeed = 10.0f;       
 
+    int currentFrame = 0;
+    int framesCounter = 0;
+    int framesSpeed = 12; 
 
 
 public:
-    Rectangle hitbox;
     Vector2 position;
     player();
     ~player();
