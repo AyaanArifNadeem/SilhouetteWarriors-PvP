@@ -5,13 +5,18 @@ player::player(){
     image = LoadTexture("res/bs.png");
     position = {(float)GetScreenWidth()/4-200,400};
     speed = {900,0};
-    p_dmg = 15,k_dmg = 30, scale = 0.1f, groundY = 900;
+    p_dmg = 15,k_dmg = 30, scale = 0.13f, groundY =220;
     facingRight = true;
     is_attacking = 0, is_blocking = 0, is_grounded = 0;
+    update_hitbox();
 }
 
     
 player::~player(){UnloadTexture(image);}
+
+void player::update_hitbox(){
+    hitbox = {position.x , position.y, (float)image.width*scale, (float)image.height*scale};
+}
 
 void player::draw(){
     Rectangle source = {0.0f, 0.0f, (float)image.width, (float)image.height};
@@ -19,6 +24,7 @@ void player::draw(){
     Rectangle destin = {position.x, position.y, (float)image.width*scale, (float)image.height*scale};
     
     DrawTexturePro(image,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
+    DrawRectangleLinesEx(hitbox,2.0f,RED);
 }
 
 void player::gravity_on(){
@@ -38,15 +44,16 @@ void player::update(){
     is_grounded=0;
     gravity_on();
 
-
-    if (IsKeyDown(KEY_A) && position.x > 0){position.x -= speed.x * deltaTime;}
-    else if(IsKeyDown(KEY_D) && position.x < 2500){position.x += speed.x * deltaTime;}
+    if ((IsKeyDown(KEY_A)  && !IsKeyDown(KEY_D)) && position.x > 0){position.x -= speed.x * deltaTime;}
+    else if((IsKeyDown(KEY_D) && !IsKeyDown(KEY_A)) && position.x < 2500){position.x += speed.x * deltaTime;}
+    update_hitbox();
 
     if(position.y >= groundY - (image.height * scale)) {is_grounded = true;}
 
     if(IsKeyDown(KEY_W) && is_grounded){
         speed.y = jumpVelocity;
     }
+    update_hitbox();
 
     position.y += speed.y * deltaTime;
 
