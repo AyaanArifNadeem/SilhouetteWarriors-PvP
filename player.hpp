@@ -6,10 +6,11 @@ private:
     Rectangle hitbox;
     Rectangle frameRec;
 
+
     Texture2D image,running_anim;
     Vector2 speed;
     float p_dmg, k_dmg, scale, groundY, keyframe;
-    bool facingRight, is_attacking, is_blocking, is_grounded, is_moving;
+    bool is_attacking, is_blocking, is_grounded, is_moving;
 
     const float gravity= 600.0f;
     const float acceleration = 500.0f;
@@ -23,15 +24,18 @@ private:
 
 
 public:
+    KeyboardKey Jump, Left, Right, crouch;
+
+    bool facingRight;
     Vector2 position;
+    void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right);
     player();
     ~player();
     void update_hitbox();
     void draw();
     void gravity_on();
     void update();
-    void punch();
-    void kick();
+    
 
 
 

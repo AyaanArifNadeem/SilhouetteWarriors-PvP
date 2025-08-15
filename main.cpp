@@ -13,13 +13,16 @@ int main(){
 
 //Entity Decleration
     player p1; 
-    Rectangle enemy =  {(2500/2)-200, 450/2-590, 200*1.3, 450*1.3};
+    player p2;
+    p1.setControls(KEY_W, KEY_S, KEY_A, KEY_D);
+    p2.setControls(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+    p2.position = {1800.0f, -300.0f};
     map1 m1;
 
 
 //Camera Setup
     Camera2D camera = { 0 };
-    camera.target = (Vector2){ ((p1.position.x + enemy.x+200)/2.0f), ((p1.position.y + enemy.y)/2.0f) };
+    camera.target = (Vector2){ ((p1.position.x + p2.position.x+200)/2.0f), ((p1.position.y + p2.position.y)/2.0f) };
     camera.offset = (Vector2){ ScreenWidth/2.0f, ScreenHeight/2.0f-140 };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
@@ -28,15 +31,18 @@ int main(){
 
     while(!WindowShouldClose()){
 //UPDATE
-        m1.update(p1, enemy); 
+        m1.update(p1, p2); 
         p1.update();
+        p2.update();
 
+        if(p2.position.x>p1.position.x){p2.facingRight = 0; p1.facingRight =1;}
+        if(p2.position.x<p1.position.x){p2.facingRight = 1; p1.facingRight =0;}
 
 //Camera Work
-        camera.target = (Vector2){ ((p1.position.x + enemy.x+(200*1.3f))/2.0f), ((p1.position.y + enemy.y)/2.0f) };
-        if(fabs(p1.position.x-enemy.x) > 1720){
-            camera.zoom = 1.646 - 0.000375*(fabs(p1.position.x-enemy.x));
-            m1.flooroffset =  ((fabs(p1.position.x-enemy.x))-1720)*0.211538461f;
+        camera.target = (Vector2){ ((p1.position.x + p2.position.x+(200*1.3f))/2.0f), ((p1.position.y + p2.position.y)/2.0f) };
+        if(fabs(p1.position.x-p2.position.x) > 1720){
+            camera.zoom = 1.646 - 0.000375*(fabs(p1.position.x-p2.position.x));
+            m1.flooroffset =  ((fabs(p1.position.x-p2.position.x))-1720)*0.211538461f;
         }else{camera.zoom = 1.0f; m1.flooroffset = 0.0f;}
         if (camera.zoom > 1.0f) camera.zoom = 1.0f;
         if (camera.zoom < 0.6f) camera.zoom = 0.6f;
@@ -48,13 +54,13 @@ int main(){
 
             m1.draw();
             // DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
-            // DrawText(TextFormat("Pos: %f", enemy.y), 100, 200, 50, BLUE);
+            // DrawText(TextFormat("Pos: %f", p2.y), 100, 200, 50, BLUE);
             DrawRectangle(-1000, 975.0f-(m1.flooroffset), 5000, 3000, BLACK);
 
 
             BeginMode2D(camera);   
 
-                DrawRectangleRec(enemy, BLUE);
+                p2.draw();
                 p1.draw();
 
             EndMode2D();

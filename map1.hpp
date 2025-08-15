@@ -11,6 +11,6 @@ public:
     float flooroffset;
     map1();
     ~map1();
-    void update(player &p1, Rectangle &enemy);
+    void update(player &p1, player &enemy);
     void draw();
 };

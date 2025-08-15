@@ -14,6 +14,11 @@ player::player(){
 }
 
 
+void player::setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right){
+    Jump = up, crouch = down, Left = left, Right = right;
+}
+
+
 void player::update_hitbox(){
     hitbox = {position.x , position.y, (float)image.width*scale, (float)image.height*scale};
 }
@@ -25,13 +30,14 @@ void player::draw(){
 
     if(!is_moving){
         source = {0.0f, 0.0f, (float)image.width, (float)image.height};
+        if (!facingRight) {source.width *= -1;}
         DrawTexturePro(image,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
     }else if(is_moving){
         source = {200.0f*currentFrame, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
+        if (!facingRight) {source.width *= -1;}
         DrawTexturePro(running_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }
 
-    if (!facingRight) {source.width *= -1;}
     
     DrawRectangleLinesEx(hitbox,2.0f,RED);
 }
@@ -63,11 +69,11 @@ void player::update(){
         frameRec.x = (float)currentFrame*(float)running_anim.width/8;
     }
 
-    if((IsKeyDown(KEY_A)  && !IsKeyDown(KEY_D)) && position.x > 0){position.x -= speed.x * deltaTime;is_moving=1;}
-    else if((IsKeyDown(KEY_D) && !IsKeyDown(KEY_A)) && position.x < 2500){position.x += speed.x * deltaTime;is_moving=1;}
+    if((IsKeyDown(Left)  && !IsKeyDown(Right)) && position.x > 0){position.x -= speed.x * deltaTime;is_moving=1;}
+    else if((IsKeyDown(Right) && !IsKeyDown(Left)) && position.x < 2500){position.x += speed.x * deltaTime;is_moving=1;}
 
     if(position.y >= groundY - (image.height * scale)){is_grounded = true;}
-    if(IsKeyDown(KEY_W) && is_grounded){speed.y = jumpVelocity;}
+    if(IsKeyPressed(Jump) && is_grounded){speed.y = jumpVelocity;}
 
     update_hitbox();
     

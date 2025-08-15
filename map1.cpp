@@ -30,40 +30,38 @@ map1::~map1(){
     UnloadTexture(sky);
 }
 
-void map1::update(player &p1, Rectangle &enemy){
+void map1::update(player &p1, player &enemy){
     float ScreenWidth = GetScreenWidth(), ScreenHeight = GetScreenHeight();
     scrollingMid -= 0.4f;
     scrollingMid2 -= 0.5f;
     if (scrollingMid <= -c1.width) scrollingMid = ScreenWidth;
     if (scrollingMid2 <= -c2.width*0.75) scrollingMid2 = ScreenWidth;
 
-    if ((IsKeyDown(KEY_D) && !IsKeyDown(KEY_A)) && p1.position.x < 2500){ 
+    if ((IsKeyDown(p1.Right) && !IsKeyDown(p1.Left)) && p1.position.x < 2500){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(KEY_A)  && !IsKeyDown(KEY_D)) && p1.position.x > 0){ 
+        else if ((IsKeyDown(p1.Left)  && !IsKeyDown(p1.Right)) && p1.position.x > 0){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
-        if ((IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT)) && enemy.x < 2500){ 
-            enemy.x += 15;
+        if ((IsKeyDown(enemy.Right) && !IsKeyDown(enemy.Left)) && enemy.position.x < 2500){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(KEY_LEFT)  && !IsKeyDown(KEY_RIGHT)) && enemy.x > 0){ 
-            enemy.x -= 15;
+        else if ((IsKeyDown(enemy.Left)  && !IsKeyDown(enemy.Right)) && enemy.position.x > 0){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
         
-        if(enemy.x < 0) enemy.x=0;
-        if(enemy.x > 2500) enemy.x=2500;
+        if(enemy.position.x < 0) enemy.position.x=0;
+        if(enemy.position.x > 2500) enemy.position.x=2500;
 }
 
 void map1::draw(){
