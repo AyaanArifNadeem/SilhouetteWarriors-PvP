@@ -10,8 +10,8 @@ private:
 
     Texture2D image,running_anim;
     Vector2 speed;
-    float p_dmg, k_dmg, scale, groundY, keyframe;
-    bool is_attacking, is_blocking, is_grounded, is_moving;
+    float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times;
+    bool facingRight, is_attacking, is_blocking, is_grounded, is_moving;
 
     const float gravity= 600.0f;
     const float acceleration = 500.0f;
@@ -26,23 +26,24 @@ private:
 
 public:
 
-    player();
-
-    bool facingRight;
+    bool R_move_allowed, L_move_allowed, R_dash, L_dash;
     Vector2 position;
+    
+    player();
+    
     void update_hitbox();
     void draw();
     void gravity_on();
-    void update();
-
+    void update(player &p2);
     void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right);    
+    
     KeyboardKey GetJump();
     KeyboardKey GetCrouch();
     KeyboardKey GetLeft();
     KeyboardKey GetRight();
     KeyboardKey GetPunch();
     KeyboardKey GetKick();
-
+    Rectangle GetHitbox();
 
 
     ~player();

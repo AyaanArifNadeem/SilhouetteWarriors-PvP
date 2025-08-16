@@ -30,39 +30,48 @@ map1::~map1(){
     UnloadTexture(sky);
 }
 
-void map1::update(player &p1, player &enemy){
+void map1::update(player &p1, player &p2){
     float ScreenWidth = GetScreenWidth(), ScreenHeight = GetScreenHeight();
     scrollingMid -= 0.4f;
     scrollingMid2 -= 0.5f;
     if (scrollingMid <= -c1.width) scrollingMid = ScreenWidth;
     if (scrollingMid2 <= -c2.width*0.75) scrollingMid2 = ScreenWidth;
 
-    if ((IsKeyDown(p1.GetRight()) && !IsKeyDown(p1.GetLeft())) && p1.position.x < 2500){ 
+    if((p1.R_dash || p2.R_dash)){
+        scrollingfront3 -= 2*18;
+        scrollingfront2 -= 1*18;
+        scrollingfront1 -= 0.5*18;
+    }
+
+    if((p1.L_dash || p2.L_dash)){
+        scrollingfront3 += 2*18;
+        scrollingfront2 += 1*18;
+        scrollingfront1 += 0.5*18;
+    }
+
+    if ((IsKeyDown(p1.GetRight()) && !IsKeyDown(p1.GetLeft())) && p1.R_move_allowed){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(p1.GetLeft())  && !IsKeyDown(p1.GetRight())) && p1.position.x > 0){ 
+        else if ((IsKeyDown(p1.GetLeft())  && !IsKeyDown(p1.GetRight())) && p1.L_move_allowed){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
-        if ((IsKeyDown(enemy.GetRight()) && !IsKeyDown(enemy.GetLeft())) && enemy.position.x < 2500){ 
+        if ((IsKeyDown(p2.GetRight()) && !IsKeyDown(p2.GetLeft())) && p2.R_move_allowed){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(enemy.GetLeft())  && !IsKeyDown(enemy.GetRight())) && enemy.position.x > 0){ 
+        else if ((IsKeyDown(p2.GetLeft())  && !IsKeyDown(p2.GetRight())) && p2.L_move_allowed){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
-        
-        if(enemy.position.x < 0) enemy.position.x=0;
-        if(enemy.position.x > 2500) enemy.position.x=2500;
-}
+    }
 
 void map1::draw(){
     float ScreenWidth = GetScreenWidth(), ScreenHeight = GetScreenHeight();

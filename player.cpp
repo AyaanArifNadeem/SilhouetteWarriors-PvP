@@ -7,7 +7,7 @@ player::player(){
     frameRec = { 0.0f, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
     position = {(float)GetScreenWidth()/4-200,400};
     speed = {900,0};
-    p_dmg = 15,k_dmg = 30, scale = 0.13f, groundY =220, keyframe = 200;
+    health = 200, p_dmg = 10,k_dmg = 20, scale = 0.13f, groundY =220, keyframe = 200, L_input_times = 0.0f;
     facingRight = true;
     is_attacking = 0, is_blocking = 0, is_grounded = 0, is_moving = 0;
     update_hitbox();
@@ -19,7 +19,8 @@ void player::setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, Key
 }
 
 
-void player::update_hitbox(){
+void player::update_hitbox()
+{
     hitbox = {position.x , position.y, (float)image.width*scale, (float)image.height*scale};
 }
 
@@ -56,12 +57,12 @@ void player::gravity_on(){
 }
 
 
-void player::update(){
+void player::update(player &p2){
+    R_dash = 0, L_dash = 0, is_moving = 0;
     framesCounter++;
-    is_moving = 0;
-    is_grounded = 0;
     gravity_on();
 
+//Movement Frames
     if (framesCounter >= (60/framesSpeed)){
         framesCounter = 0;
         currentFrame++;
@@ -69,19 +70,52 @@ void player::update(){
         frameRec.x = (float)currentFrame*(float)running_anim.width/8;
     }
 
-    if((IsKeyDown(Left)  && !IsKeyDown(Right)) && position.x > 0){position.x -= speed.x * deltaTime;is_moving=1;}
-    else if((IsKeyDown(Right) && !IsKeyDown(Left)) && position.x < 2500){position.x += speed.x * deltaTime;is_moving=1;}
 
-    if(position.y >= groundY - (image.height * scale)){is_grounded = true;}
+//Direction
+    if(position.x < p2.position.x){facingRight = 1;}
+    else{facingRight = 0;}
+
+
+//Collision
+    if((position.x < p2.position.x) && ((CheckCollisionRecs(hitbox,p2.hitbox)) && ((position.x+hitbox.width)-p2.position.x) >= 170.0f)){position.x = p2.position.x-170.0f;}
+    if(position.x < 2500.0f && position.x != p2.position.x-170.0f){ R_move_allowed = 1;}else{R_move_allowed = 0;}
+    if(position.x > 0.0f && position.x != p2.position.x+170.0f){ L_move_allowed = 1;}else{L_move_allowed = 0;}
+
+
+//Movement
+    //Dash
+    if(!CheckCollisionRecs(hitbox, p2.hitbox)){L_input_times = 0; R_input_times = 0;}
+    else{
+        if(position.x < p2.position.x && p2.position.x < 2240.0f){
+            if(IsKeyPressed(Right)){R_input_times++;}
+            if(R_input_times == 3.0){position.x = p2.position.x + p2.hitbox.width; R_input_times = 0; R_dash = 1;}
+        }
+        if(position.x > p2.position.x && position.x > 260.0f){
+            if(IsKeyPressed(Left)){L_input_times++;}
+            if(L_input_times == 3.0){position.x = p2.position.x - hitbox.width; L_input_times = 0; L_dash = 1;}
+        }
+    }
+    //Regular
+    if((IsKeyDown(Left)  && !IsKeyDown(Right)) && L_move_allowed){position.x -= speed.x * deltaTime;is_moving=1;}
+    if((IsKeyDown(Right) && !IsKeyDown(Left)) && R_move_allowed){position.x += speed.x * deltaTime;is_moving=1;}
+    
+
+//Jump
+    if(position.y >= groundY - (image.height * scale)){is_grounded = true;}else{is_grounded = 0;}
     if(IsKeyPressed(Jump) && is_grounded){speed.y = jumpVelocity;}
+    position.y += speed.y * deltaTime;
 
     update_hitbox();
-    
-    position.y += speed.y * deltaTime;
+
+
+//Clamping
+    if(p2.position.x == 2500.0f && position.x > 2330.0f) position.x = 2330.0f;
+    if(p2.position.x == 0.0f && position.x < 170.0f) position.x = 170.0f;
     if(position.x > 2500) position.x = 2500;
     if(position.x < 0) position.x = 0;
 }
 
+Rectangle player::GetHitbox(){return hitbox;}
 KeyboardKey player::GetJump(){return Jump;}
 KeyboardKey player::GetCrouch(){return crouch;}
 KeyboardKey player::GetLeft(){return Left;}

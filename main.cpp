@@ -32,11 +32,9 @@ int main(){
     while(!WindowShouldClose()){
 //UPDATE
         m1.update(p1, p2); 
-        p1.update();
-        p2.update();
+        p1.update(p2);
+        p2.update(p1);
 
-        if(p2.position.x>p1.position.x){p2.facingRight = 0; p1.facingRight =1;}
-        if(p2.position.x<p1.position.x){p2.facingRight = 1; p1.facingRight =0;}
 
 //Camera Work
         camera.target = (Vector2){ ((p1.position.x + p2.position.x+(200*1.3f))/2.0f), ((p1.position.y + p2.position.y)/2.0f) };
@@ -54,7 +52,8 @@ int main(){
 
             m1.draw();
             DrawRectangle(-1000, 975.0f-(m1.flooroffset), 5000, 3000, BLACK);
-
+            // DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
+            // DrawText(TextFormat("Pos: %f", p2.position.x), 100, 200, 50, BLUE);
 
             BeginMode2D(camera);   
 
