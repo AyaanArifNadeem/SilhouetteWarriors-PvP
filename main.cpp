@@ -14,9 +14,9 @@ int main(){
 //Entity Decleration
     player p1; 
     player p2;
+    p2.position = {1800.0f, -300.0f};
     p1.setControls(KEY_W, KEY_S, KEY_A, KEY_D);
     p2.setControls(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
-    p2.position = {1800.0f, -300.0f};
     map1 m1;
 
 
@@ -53,8 +53,6 @@ int main(){
             ClearBackground(RAYWHITE);
 
             m1.draw();
-            // DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
-            // DrawText(TextFormat("Pos: %f", p2.y), 100, 200, 50, BLUE);
             DrawRectangle(-1000, 975.0f-(m1.flooroffset), 5000, 3000, BLACK);
 
 

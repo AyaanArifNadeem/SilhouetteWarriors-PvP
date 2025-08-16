@@ -6,6 +6,7 @@ private:
     Rectangle hitbox;
     Rectangle frameRec;
 
+    KeyboardKey Jump, Left, Right, crouch;
 
     Texture2D image,running_anim;
     Vector2 speed;
@@ -24,20 +25,26 @@ private:
 
 
 public:
-    KeyboardKey Jump, Left, Right, crouch;
+
+    player();
 
     bool facingRight;
     Vector2 position;
-    void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right);
-    player();
-    ~player();
     void update_hitbox();
     void draw();
     void gravity_on();
     void update();
-    
+
+    void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right);    
+    KeyboardKey GetJump();
+    KeyboardKey GetCrouch();
+    KeyboardKey GetLeft();
+    KeyboardKey GetRight();
+    KeyboardKey GetPunch();
+    KeyboardKey GetKick();
 
 
 
+    ~player();
 
 };

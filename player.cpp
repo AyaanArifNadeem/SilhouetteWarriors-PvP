@@ -59,7 +59,7 @@ void player::gravity_on(){
 void player::update(){
     framesCounter++;
     is_moving = 0;
-    is_grounded=0;
+    is_grounded = 0;
     gravity_on();
 
     if (framesCounter >= (60/framesSpeed)){
@@ -82,5 +82,9 @@ void player::update(){
     if(position.x < 0) position.x = 0;
 }
 
+KeyboardKey player::GetJump(){return Jump;}
+KeyboardKey player::GetCrouch(){return crouch;}
+KeyboardKey player::GetLeft(){return Left;}
+KeyboardKey player::GetRight(){return Right;}
 
 player::~player(){UnloadTexture(image);}

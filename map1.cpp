@@ -37,23 +37,23 @@ void map1::update(player &p1, player &enemy){
     if (scrollingMid <= -c1.width) scrollingMid = ScreenWidth;
     if (scrollingMid2 <= -c2.width*0.75) scrollingMid2 = ScreenWidth;
 
-    if ((IsKeyDown(p1.Right) && !IsKeyDown(p1.Left)) && p1.position.x < 2500){ 
+    if ((IsKeyDown(p1.GetRight()) && !IsKeyDown(p1.GetLeft())) && p1.position.x < 2500){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(p1.Left)  && !IsKeyDown(p1.Right)) && p1.position.x > 0){ 
+        else if ((IsKeyDown(p1.GetLeft())  && !IsKeyDown(p1.GetRight())) && p1.position.x > 0){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
         }
 
-        if ((IsKeyDown(enemy.Right) && !IsKeyDown(enemy.Left)) && enemy.position.x < 2500){ 
+        if ((IsKeyDown(enemy.GetRight()) && !IsKeyDown(enemy.GetLeft())) && enemy.position.x < 2500){ 
             scrollingfront3 -= 2;
             scrollingfront2 -= 1;
             scrollingfront1 -= 0.5;
         }
-        else if ((IsKeyDown(enemy.Left)  && !IsKeyDown(enemy.Right)) && enemy.position.x > 0){ 
+        else if ((IsKeyDown(enemy.GetLeft())  && !IsKeyDown(enemy.GetRight())) && enemy.position.x > 0){ 
             scrollingfront3 += 2;
             scrollingfront2 += 1;
             scrollingfront1 += 0.5;
