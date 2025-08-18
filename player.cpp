@@ -8,9 +8,9 @@ player::player(){
     frameRec = { 0.0f, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
     position = {(float)GetScreenWidth()/4-200,400};
     speed = {900,0};
-    health = 200, p_dmg = 10,k_dmg = 20, scale = 0.13f, groundY =220, keyframe = 200, Jumpheight = 0;
+    health = 200, p_dmg = 10,k_dmg = 20, scale = 0.13f, groundY =220, keyframe = 200, Jumpheight = 0, crouchdepth = 0, crouch_y = 0;
     facingRight = true;
-    is_attacking = 0, is_blocking = 0, is_grounded = 0, is_moving = 0, just_dashed = 0, R_dash_allowed = 1, L_dash_allowed = 1;
+    is_attacking = 0, is_blocking = 0, is_grounded = 0, is_upright = 0, is_moving = 0, just_dashed = 0, R_dash_allowed = 1, L_dash_allowed = 1;
 }
 
 
@@ -23,10 +23,10 @@ void player::update_hitbox()
 {
     hitbox = {position.x , position.y, (float)image.width*scale, (float)image.height*scale};
     if(facingRight){
-        c_hitbox = {position.x + 50.0f, position.y + 80.0f, (float)image.width*scale- 130.0f, ((float)image.height*scale/2.0f)-80.0f};
+        c_hitbox = {position.x + 50.0f, position.y + 80.0f + crouchdepth, (float)image.width*scale- 130.0f, ((float)image.height*scale/2.0f)-80.0f - crouchdepth};
         l_hitbox = {position.x + 40.0f , position.y + ((float)image.height*scale)/2.0f, (float)image.width*scale - 100.0f, (float)image.height*scale/2.0f + Jumpheight};
     }else if(!facingRight){
-        c_hitbox = {position.x + 80.0f, position.y + 80.0f, (float)image.width*scale- 130.0f, ((float)image.height*scale/2.0f)-80.0f};
+        c_hitbox = {position.x + 80.0f, position.y + 80.0f + crouchdepth, (float)image.width*scale- 130.0f, ((float)image.height*scale/2.0f)-80.0f - crouchdepth};
         l_hitbox = {position.x + 60.0f , position.y + ((float)image.height*scale)/2.0f, (float)image.width*scale - 100.0f, (float)image.height*scale/2.0f + Jumpheight};
     }
 }
@@ -62,9 +62,19 @@ void player::gravity_on(){
         Jumpheight += speed.y * deltaTime;
     }
 
+    if(!is_upright){
+        crouch_y += upwardsAcceleration * deltaTime;
+        crouchdepth += speed.y * deltaTime;
+    }
+
     if((Jumpheight > 0)){
         Jumpheight = 0;
         speed.y = 0;
+    }
+
+    if(crouchdepth < 0){
+        crouchdepth = 0;
+        crouch_y = 0;
     }
     
     if((position.y > groundY - (float)image.height*scale)){
@@ -106,7 +116,8 @@ void player::update(player &p2){
 
 
 //Movement
-    if(!is_grounded){L_move_allowed = 0; R_move_allowed = 0, R_dash_allowed = 0, L_dash_allowed = 0;}
+    //Movement allowed Check
+    if(!is_grounded || !is_upright){L_move_allowed = 0; R_move_allowed = 0, R_dash_allowed = 0, L_dash_allowed = 0;}
     //Dash
     if(!CheckCollisionRecs(hitbox, p2.hitbox)){L_input_times = 0; R_input_times = 0;}
     else{
@@ -129,6 +140,12 @@ void player::update(player &p2){
     if(IsKeyPressed(Jump) && is_grounded){speed.y = jumpVelocity;}
     Jumpheight += speed.y * deltaTime;
 
+//Crouch
+    if(c_hitbox.y <= -285.0f){is_upright = 1, R_dash_allowed = 1, L_dash_allowed = 1;}else{is_upright  = 0;}
+    if(IsKeyPressed(crouch) && is_upright){crouch_y = crouchVelocity;}
+    crouchdepth += crouch_y * deltaTime;
+
+
     update_hitbox();
 
 
@@ -139,6 +156,8 @@ void player::update(player &p2){
     if(position.x < 0) position.x = 0;
 }
 
+
+//Getters
 Rectangle player::GetHitbox(){return hitbox;}
 Rectangle player::GetCHitbox(){return c_hitbox;}
 Rectangle player::GetLHitbox(){return l_hitbox;}
@@ -146,6 +165,7 @@ KeyboardKey player::GetJump() { return Jump; }
 KeyboardKey player::GetCrouch(){return crouch;}
 KeyboardKey player::GetLeft(){return Left;}
 KeyboardKey player::GetRight(){return Right;}
+
 
 player::~player(){
     UnloadTexture(image);
