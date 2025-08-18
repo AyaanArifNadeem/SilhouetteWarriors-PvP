@@ -3,15 +3,14 @@
 
 class player{
 private:
-    Rectangle hitbox;
-    Rectangle frameRec;
+    Rectangle hitbox, c_hitbox, l_hitbox, frameRec;
 
     KeyboardKey Jump, Left, Right, crouch;
 
-    Texture2D image,running_anim;
+    Texture2D image,running_anim,dash_anim;
     Vector2 speed;
     float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times;
-    bool facingRight, is_attacking, is_blocking, is_grounded, is_moving;
+    bool facingRight, is_attacking, is_blocking, is_grounded, is_moving, just_dashed;
 
     const float gravity= 600.0f;
     const float acceleration = 500.0f;
@@ -23,6 +22,9 @@ private:
     int framesCounter = 0;
     int framesSpeed = 12; 
 
+    int currentFrameDash = 0;
+    int framesCounterDash = 0;
+    int framesSpeedDash = 10; 
 
 public:
 
@@ -44,6 +46,8 @@ public:
     KeyboardKey GetPunch();
     KeyboardKey GetKick();
     Rectangle GetHitbox();
+    Rectangle GetCHitbox();
+    Rectangle GetLHitbox();
 
 
     ~player();
