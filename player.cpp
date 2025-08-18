@@ -137,12 +137,12 @@ void player::update(player &p2){
 
 //Jump
     if((l_hitbox.y + l_hitbox.height) >= groundY){is_grounded = 1, R_dash_allowed = 1, L_dash_allowed = 1;}else{is_grounded = 0;}
-    if(IsKeyPressed(Jump) && is_grounded){speed.y = jumpVelocity;}
+    if(IsKeyPressed(Jump) && is_grounded && is_upright && !IsKeyDown(crouch)){speed.y = jumpVelocity;}
     Jumpheight += speed.y * deltaTime;
 
 //Crouch
     if(c_hitbox.y <= -285.0f){is_upright = 1, R_dash_allowed = 1, L_dash_allowed = 1;}else{is_upright  = 0;}
-    if(IsKeyPressed(crouch) && is_upright){crouch_y = crouchVelocity;}
+    if(IsKeyPressed(crouch) && is_upright && is_grounded && !IsKeyDown(Jump)){crouch_y = crouchVelocity;}
     crouchdepth += crouch_y * deltaTime;
 
 
