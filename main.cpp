@@ -52,8 +52,8 @@ int main(){
 
             m1.draw();
             DrawRectangle(-1000, 975.0f-(m1.flooroffset), 5000, 3000, BLACK);
-            // DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
-            // DrawText(TextFormat("Pos: %f", p2.position.x), 100, 200, 50, BLUE);
+            DrawText(TextFormat("Pos: %f", p1.position.x), 100, 100, 50, RED);
+            DrawText(TextFormat("Pos: %f", p2.position.x), 100, 200, 50, BLUE);
 
             BeginMode2D(camera);   
 
