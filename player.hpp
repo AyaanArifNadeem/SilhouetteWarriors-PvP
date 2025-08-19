@@ -7,16 +7,16 @@ private:
 
     KeyboardKey Jump, Left, Right, crouch;
 
-    Texture2D image,running_anim,dash_anim, jump_anim, crouch_anim;
+    Texture2D image, idle_block, running_anim,dash_anim, jump_anim, crouch_anim;
     Vector2 speed;
     float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times, Jumpheight, crouchdepth, crouch_y;
     bool facingRight, is_attacking, is_blocking, is_grounded, is_upright, is_moving, just_dashed, R_dash_allowed, L_dash_allowed;
 
-    const float gravity= 900.0f;
-    const float upwardsAcceleration = -900.0f;
+    const float gravity= 1200.0f;
+    const float upwardsAcceleration = -1200.0f;
     const float deltaTime = 1.0f / 60.0f;
     const float jumpVelocity = -500.0f;
-    const float crouchVelocity = 600.0f;
+    const float crouchVelocity = 500.0f;
     float moveSpeed = 10.0f;       
 
     int currentFrame = 0;
@@ -29,7 +29,7 @@ private:
 
     int currentFrameJump = 0;
     int framesCounterJump = 0;
-    int framesSpeedJump = 5; 
+    int framesSpeedJump = 8; 
 
 public:
 

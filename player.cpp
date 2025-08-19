@@ -7,6 +7,7 @@ player::player(){
     dash_anim = LoadTexture("res/da.png");
     jump_anim = LoadTexture("res/ja.png");
     crouch_anim = LoadTexture("res/caa.png");
+    idle_block = LoadTexture("res/b.png");
     frameRec = { 0.0f, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
     position = {(float)GetScreenWidth()/4-200,400};
     speed = {900,0};
@@ -51,18 +52,27 @@ void player::draw(){
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(dash_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }else if(!is_moving){
-        source = {0.0f, 0.0f, (float)image.width, (float)image.height};
-        if (!facingRight) {source.width *= -1;}
-        DrawTexturePro(image,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
+        if(is_blocking){
+            source = {0.0f, 0.0f, (float)idle_block.width, (float)idle_block.height};
+            if (!facingRight) {source.width *= -1;}
+            DrawTexturePro(idle_block,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
+        }else if(!is_blocking){
+            source = {0.0f, 0.0f, (float)image.width, (float)image.height};
+            if (!facingRight) {source.width *= -1;}
+            DrawTexturePro(image,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
+        }
     }else if(is_moving){
         source = {200.0f*currentFrame, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(running_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }    
     
-   if(IsKeyDown(KEY_LEFT_CONTROL)){ DrawRectangleLinesEx(hitbox,2.0f,RED);
+//    if(IsKeyDown(KEY_LEFT_CONTROL)){ 
+    DrawRectangleLinesEx(hitbox,2.0f,RED);
     DrawRectangleLinesEx(c_hitbox,2.0f,BLUE);
-    DrawRectangleLinesEx(l_hitbox,2.0f,PURPLE);}
+    DrawRectangleLinesEx(l_hitbox,2.0f,PURPLE);
+    if(is_blocking) DrawRectangleLines(hitbox.x + hitbox.width, hitbox.y, 10, hitbox.height/2.0f, GREEN);
+    // }
 }
 
 
@@ -74,7 +84,7 @@ void player::gravity_on(){
 
     if(!is_upright){
         crouch_y += upwardsAcceleration * deltaTime;
-        crouchdepth += speed.y * deltaTime;
+        crouchdepth += crouch_y * deltaTime;
     }
 
     if((Jumpheight > 0)){
@@ -94,12 +104,16 @@ void player::gravity_on(){
 
 
 void player::update(player &p2){
+
+//General Updates
+    is_blocking = (facingRight && IsKeyDown(Left)) || (!facingRight && IsKeyDown(Right)) ?  1 : 0;
     R_dash = 0, L_dash = 0, is_moving = 0;
     framesCounter++;framesCounterDash++;framesCounterJump++;
     gravity_on();
 
 
 //Movement Frames
+    //Movement
     if (framesCounter >= (60/framesSpeed)){
         framesCounter = 0;
         currentFrame++;
@@ -107,6 +121,7 @@ void player::update(player &p2){
         frameRec.x = (float)currentFrame*(float)running_anim.width/8;
     }
 
+    //Dash
     if(just_dashed && (framesCounterDash >= (60/framesSpeedDash))){
         framesCounterDash = 0;
         currentFrameDash++;
@@ -114,6 +129,7 @@ void player::update(player &p2){
         frameRec.x = (float)currentFrameDash*(float)dash_anim.width/8;
     }
 
+    //Jump and Crouch
     if(is_grounded && is_upright){currentFrameJump = 0;}
     if((!is_grounded || !is_upright) && (framesCounterJump >= (60/framesSpeedJump))){
         framesCounterJump = 0;
@@ -191,4 +207,5 @@ player::~player(){
     UnloadTexture(dash_anim);
     UnloadTexture(jump_anim);
     UnloadTexture(crouch_anim);
+    UnloadTexture(idle_block);
 }
