@@ -5,6 +5,8 @@ player::player(){
     image = LoadTexture("res/bs.png");
     running_anim = LoadTexture("res/ra.png");
     dash_anim = LoadTexture("res/da.png");
+    jump_anim = LoadTexture("res/ja.png");
+    crouch_anim = LoadTexture("res/caa.png");
     frameRec = { 0.0f, 0.0f, (float)running_anim.width/8, (float)running_anim.height};
     position = {(float)GetScreenWidth()/4-200,400};
     speed = {900,0};
@@ -36,7 +38,15 @@ void player::draw(){
     Rectangle source;
     Rectangle destin = {position.x, position.y, (float)image.width*scale, (float)image.height*scale};
 
-    if(just_dashed){
+    if(!is_upright){
+        source = {200.0f*currentFrameJump, 0.0f, (float)crouch_anim.width/8, (float)crouch_anim.height};;
+        if (!facingRight) {source.width *= -1;}
+        DrawTexturePro(crouch_anim,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
+    }else if(!is_grounded){
+        source = {200.0f*currentFrameJump, 0.0f, (float)jump_anim.width/8, (float)jump_anim.height};
+        if (!facingRight) {source.width *= -1;}
+        DrawTexturePro(jump_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
+    }else if(just_dashed){
         source = {200.0f*currentFrameDash, 0.0f, (float)dash_anim.width/8, (float)dash_anim.height};
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(dash_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
@@ -50,9 +60,9 @@ void player::draw(){
         DrawTexturePro(running_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }    
     
-    DrawRectangleLinesEx(hitbox,2.0f,RED);
+   if(IsKeyDown(KEY_LEFT_CONTROL)){ DrawRectangleLinesEx(hitbox,2.0f,RED);
     DrawRectangleLinesEx(c_hitbox,2.0f,BLUE);
-    DrawRectangleLinesEx(l_hitbox,2.0f,PURPLE);
+    DrawRectangleLinesEx(l_hitbox,2.0f,PURPLE);}
 }
 
 
@@ -85,7 +95,7 @@ void player::gravity_on(){
 
 void player::update(player &p2){
     R_dash = 0, L_dash = 0, is_moving = 0;
-    framesCounter++;framesCounterDash++;
+    framesCounter++;framesCounterDash++;framesCounterJump++;
     gravity_on();
 
 
@@ -102,6 +112,14 @@ void player::update(player &p2){
         currentFrameDash++;
         if (currentFrameDash > 7) {just_dashed = 0;currentFrameDash = 0;}
         frameRec.x = (float)currentFrameDash*(float)dash_anim.width/8;
+    }
+
+    if(is_grounded && is_upright){currentFrameJump = 0;}
+    if((!is_grounded || !is_upright) && (framesCounterJump >= (60/framesSpeedJump))){
+        framesCounterJump = 0;
+        currentFrameJump++;
+        if (currentFrameJump > 7) {currentFrameJump = 0;}
+        frameRec.x = (float)currentFrameJump*(float)jump_anim.width/8;
     }
 
 //Direction
@@ -171,4 +189,6 @@ player::~player(){
     UnloadTexture(image);
     UnloadTexture(running_anim);
     UnloadTexture(dash_anim);
+    UnloadTexture(jump_anim);
+    UnloadTexture(crouch_anim);
 }

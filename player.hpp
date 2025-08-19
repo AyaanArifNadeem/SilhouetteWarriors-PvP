@@ -7,7 +7,7 @@ private:
 
     KeyboardKey Jump, Left, Right, crouch;
 
-    Texture2D image,running_anim,dash_anim;
+    Texture2D image,running_anim,dash_anim, jump_anim, crouch_anim;
     Vector2 speed;
     float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times, Jumpheight, crouchdepth, crouch_y;
     bool facingRight, is_attacking, is_blocking, is_grounded, is_upright, is_moving, just_dashed, R_dash_allowed, L_dash_allowed;
@@ -26,6 +26,10 @@ private:
     int currentFrameDash = 0;
     int framesCounterDash = 0;
     int framesSpeedDash = 10; 
+
+    int currentFrameJump = 0;
+    int framesCounterJump = 0;
+    int framesSpeedJump = 5; 
 
 public:
 
