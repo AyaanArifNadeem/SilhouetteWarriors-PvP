@@ -3,14 +3,14 @@
 
 class player{
 private:
-    Rectangle hitbox, c_hitbox, l_hitbox, p_hitbox, frameRec;
+    Rectangle hitbox, c_hitbox, l_hitbox, p_hitbox, k_hitbox, frameRec;
 
-    KeyboardKey Jump, Left, Right, crouch, Punch;
+    KeyboardKey Jump, Left, Right, crouch, Punch, Kick;
 
-    Texture2D image, idle_block, running_anim,dash_anim, jump_anim, crouch_anim, punch_anim;
+    Texture2D image, idle_block, running_anim,dash_anim, jump_anim, crouch_anim, punch_anim, kick_anim;
     Vector2 speed;
     float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times, Jumpheight, crouchdepth, crouch_y;
-    bool facingRight, is_punching, is_blocking, is_grounded, is_upright, is_moving, just_dashed, R_dash_allowed, L_dash_allowed, p_dmg_once, can_punch;
+    bool facingRight, is_punching, is_kicking, is_blocking, is_grounded, is_upright, is_moving, just_dashed, R_dash_allowed, L_dash_allowed, p_dmg_once, can_punch, k_dmg_once, can_kick;
 
     const float gravity= 1200.0f;
     const float upwardsAcceleration = -1200.0f;
@@ -32,6 +32,7 @@ private:
     int framesSpeedJump = 8; 
 
     int CFpun = 0, FCpun =0; 
+    int CFkick = 0, FCkick = 0;
 
 public:
 
@@ -44,7 +45,7 @@ public:
     void draw();
     void gravity_on();
     void update(player &p2);
-    void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right, KeyboardKey punch);    
+    void setControls(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right, KeyboardKey punch, KeyboardKey kick);    
     
     KeyboardKey GetJump();
     KeyboardKey GetCrouch();

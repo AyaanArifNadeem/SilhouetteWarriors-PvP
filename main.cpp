@@ -15,8 +15,8 @@ int main(){
     player p1; 
     player p2;
     p2.position = {1800.0f, -300.0f};
-    p1.setControls(KEY_W, KEY_S, KEY_A, KEY_D, KEY_Q);
-    p2.setControls(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_PAGE_UP);
+    p1.setControls(KEY_W, KEY_S, KEY_A, KEY_D, KEY_Q, KEY_E);
+    p2.setControls(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_PAGE_UP, KEY_PAGE_DOWN);
     map1 m1;
 
 
