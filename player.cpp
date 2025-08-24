@@ -14,7 +14,9 @@ player::player(){
     speed = {900,0};
     health = 200, p_dmg = 10,k_dmg = 20, scale = 0.13f, groundY =220, keyframe = 200, Jumpheight = 0, crouchdepth = 0, crouch_y = 0;
     facingRight = true;
-    is_punching = 0, is_kicking = 0, is_blocking = 0, is_grounded = 0, is_upright = 0, is_moving = 0, just_dashed = 0, R_dash_allowed = 1, L_dash_allowed = 1, can_punch = 1, can_kick = 1;
+    is_punching = 0, is_kicking = 0, is_blocking = 0, is_grounded = 0, is_upright = 0, is_moving = 0, just_dashed = 0, is_alive = 1;
+    R_dash_allowed = 1, L_dash_allowed = 1, can_punch = 1, can_kick = 1, can_block = 1;
+    playpunchsfx = 0, playkicksfx = 0, playjumpsfx = 0, playcrouchsfx = 0;
 }
 
 
@@ -42,8 +44,13 @@ void player::update_hitbox(){
 void player::draw(){
     Rectangle source;
     Rectangle destin = {position.x, position.y, (float)image.width*scale, (float)image.height*scale};
-
-    if(!is_upright){
+    
+    if(!is_alive){
+        source = {0.0f, 0.0f, (float)image.width, (float)image.height};
+        Rectangle destin2 = {destin.x + destin.height, destin.y + 400, destin.width, destin.height};
+        if (!facingRight) {source.width *= -1;}
+        DrawTexturePro(image,source,destin2,{0.0f, 0.0f},+90.0f,RAYWHITE); 
+    }else if(!is_upright){
         source = {200.0f*currentFrameJump, 0.0f, (float)crouch_anim.width/8, (float)crouch_anim.height};;
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(crouch_anim,source,destin,{0.0f, 0.0f},0.0f,RAYWHITE);
@@ -52,11 +59,11 @@ void player::draw(){
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(jump_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }else if(is_punching){
-        source = {200.0f*currentFrameJump, 0.0f, (float)punch_anim.width/8, (float)punch_anim.height};
+        source = {200.0f*currentFrameAtk, 0.0f, (float)punch_anim.width/8, (float)punch_anim.height};
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(punch_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }else if(is_kicking){
-        source = {200.0f*currentFrameJump, 0.0f, (float)kick_anim.width/8, (float)kick_anim.height};
+        source = {200.0f*currentFrameAtk, 0.0f, (float)kick_anim.width/8, (float)kick_anim.height};
         if (!facingRight) {source.width *= -1;}
         DrawTexturePro(kick_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }else if(just_dashed){
@@ -79,7 +86,9 @@ void player::draw(){
         DrawTexturePro(running_anim,source,destin,{0.0f, 0.0f}, 0.0f, RAYWHITE);
     }    
 
-    DrawText(TextFormat("%d", (int)health), hitbox.x, hitbox.y - 50, 50, RED);
+    if(!facingRight){DrawText(username, position.x + 100.0f, position.y - 50.0f, 30, LIGHTGRAY);}
+    else{DrawText(username, position.x + 70.0f, position.y - 50.0f, 30, LIGHTGRAY);}
+
     
     if(IsKeyDown(KEY_LEFT_CONTROL)){ 
     DrawRectangleLinesEx(hitbox,2.0f,RED);
@@ -119,14 +128,24 @@ void player::gravity_on(){
 
 
 void player::update(player &p2){
+//Alive check
+is_alive = (health > 0) ? 1 : 0;
+if(health < 0){health = 0;}
 
+if(!is_alive){
+
+L_move_allowed = 0; R_move_allowed = 0, R_dash_allowed = 0, L_dash_allowed = 0;
+can_block = 0, can_kick = 0, can_punch = 0;
+
+} else {
 //General Updates
-    is_blocking = (facingRight && IsKeyDown(Left)) || (!facingRight && IsKeyDown(Right)) ?  1 : 0;
+    is_blocking = ((facingRight && IsKeyDown(Left)) && can_block)|| ((!facingRight && IsKeyDown(Right)) && can_block) ?  1 : 0;
     if(is_punching || !is_grounded || !is_upright || is_kicking){is_blocking = 0;}
-    R_dash = 0, L_dash = 0, is_moving = 0;
-    framesCounter++;framesCounterDash++;framesCounterJump++; FCpun++; FCkick++;
+    R_dash = 0, L_dash = 0, is_moving = 0, playpunchsfx = 0, playkicksfx = 0, playjumpsfx = 0, playcrouchsfx = 0;
+    framesCounter++;framesCounterDash++;framesCounterJump++; framesCounterAtk++; FCpun++; FCkick++;
     gravity_on();
 
+//Timers
     if(!can_punch && FCpun >= 60/8){
         FCpun = 0;
         CFpun++;
@@ -136,7 +155,7 @@ void player::update(player &p2){
     if(!can_kick && FCkick >= 60/8){
         FCkick = 0;
         CFkick++;
-        if(CFkick > 13){CFkick = 0; can_kick = 1;}
+        if(CFkick > 13){CFkick = 0; can_kick = 1; p2.can_block = 1;}
     }
 
 //Movement Frames
@@ -155,11 +174,17 @@ void player::update(player &p2){
     }
 
     //Jump and Crouch
-    if(is_grounded && is_upright && !is_punching && !is_kicking){currentFrameJump = 0;}
-    if((!is_grounded || !is_upright || is_punching || is_kicking) && (framesCounterJump >= (60/framesSpeedJump))){
+    if(is_grounded && is_upright){currentFrameJump = 0;}
+    if((!is_grounded || !is_upright) && (framesCounterJump >= (60/framesSpeedJump))){
         framesCounterJump = 0;
         currentFrameJump++;
-        if (currentFrameJump > 7) {is_punching =0, p_dmg_once=0,is_kicking = 0, k_dmg_once=0, currentFrameJump = 0;}
+    }
+    //Punch and Kick
+    if( !is_punching && !is_kicking){currentFrameAtk = 0;}
+    if((is_punching || is_kicking) && (framesCounterAtk >= (60/framesSpeedAtk))){
+        framesCounterAtk = 0;
+        currentFrameAtk++;
+        if(currentFrameAtk > 7) {is_punching =0, p_dmg_once=0,is_kicking = 0, k_dmg_once=0;}
     }
 
 //Direction
@@ -196,17 +221,17 @@ void player::update(player &p2){
     if(((l_hitbox.y + l_hitbox.height) >= groundY) && (c_hitbox.y <= -285.0f) && !is_punching){R_dash_allowed = 1, L_dash_allowed = 1;}
 //Jump
     if((l_hitbox.y + l_hitbox.height) >= groundY){is_grounded = 1;}else{is_grounded = 0;}
-    if(IsKeyPressed(Jump) && is_grounded && is_upright && !IsKeyDown(crouch) && !is_punching && !is_kicking){speed.y = jumpVelocity;}
+    if(IsKeyPressed(Jump) && is_grounded && is_upright && !IsKeyDown(crouch) && !is_punching && !is_kicking){speed.y = jumpVelocity; playjumpsfx = 1;}
     Jumpheight += speed.y * deltaTime;
 
 //Crouch
     if(c_hitbox.y <= -285.0f){is_upright = 1;}else{is_upright  = 0;}
-    if(IsKeyPressed(crouch) && is_upright && is_grounded && !IsKeyDown(Jump) && !is_punching && !is_kicking){crouch_y = crouchVelocity;}
+    if(IsKeyPressed(crouch) && is_upright && is_grounded && !IsKeyDown(Jump) && !is_punching && !is_kicking){crouch_y = crouchVelocity;playcrouchsfx = 1;}
     crouchdepth += crouch_y * deltaTime;
 
 
 //Punch
-    if(IsKeyPressed(Punch) && is_grounded && is_upright && can_punch && !is_kicking){is_punching = true; can_punch = 0;}
+    if(IsKeyPressed(Punch) && is_grounded && is_upright && can_punch && !is_kicking){is_punching = true; can_punch = 0; playpunchsfx = 1;}
     if(is_punching){
         R_dash_allowed = 0, L_dash_allowed = 0;
         if(CheckCollisionRecs(p_hitbox,p2.c_hitbox) && !p_dmg_once && !p2.is_blocking && p2.is_upright){p2.health -= p_dmg; p_dmg_once = 1;}
@@ -214,10 +239,10 @@ void player::update(player &p2){
 
 
 //Kick
-    if(IsKeyPressed(Kick) && is_grounded && is_upright && can_kick && !is_punching){is_kicking = 1; can_kick = 0;}
+    if(IsKeyPressed(Kick) && is_grounded && is_upright && can_kick && !is_punching){is_kicking = 1; can_kick = 0; playkicksfx = 1;}
     if(is_kicking){
         R_dash_allowed = 0, L_dash_allowed = 0;
-        if(CheckCollisionRecs(k_hitbox,p2.l_hitbox) && !k_dmg_once && p2.is_upright){p2.health -= k_dmg; k_dmg_once =1;}
+        if(CheckCollisionRecs(k_hitbox,p2.l_hitbox) && !k_dmg_once && p2.is_upright){p2.health -= k_dmg; k_dmg_once =1; p2.can_block = 0;}
     }
 
     update_hitbox();
@@ -229,6 +254,7 @@ void player::update(player &p2){
     if(position.x > 2500) position.x = 2500;
     if(position.x < 0) position.x = 0;
 }
+}
 
 
 //Getters
@@ -239,7 +265,8 @@ KeyboardKey player::GetJump(){ return Jump;}
 KeyboardKey player::GetCrouch(){return crouch;}
 KeyboardKey player::GetLeft(){return Left;}
 KeyboardKey player::GetRight(){return Right;}
-
+KeyboardKey player::GetPunch(){return Punch;}
+KeyboardKey player::GetKick(){return Kick;}
 
 player::~player(){
     UnloadTexture(image);

@@ -31,12 +31,17 @@ private:
     int framesCounterJump = 0;
     int framesSpeedJump = 8; 
 
+    int currentFrameAtk = 0;
+    int framesCounterAtk = 0;
+    int framesSpeedAtk = 8; 
+
     int CFpun = 0, FCpun =0; 
     int CFkick = 0, FCkick = 0;
 
 public:
 
-    bool R_move_allowed, L_move_allowed, R_dash, L_dash;
+    bool R_move_allowed, L_move_allowed, R_dash, L_dash, can_block, is_alive, playpunchsfx, playkicksfx, playjumpsfx, playcrouchsfx;
+    char username[9] = {'P','l','a','y','e','r'};
     Vector2 position;
     
     player();
