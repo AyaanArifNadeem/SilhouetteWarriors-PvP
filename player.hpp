@@ -9,7 +9,7 @@ private:
 
     Texture2D image, idle_block, running_anim,dash_anim, jump_anim, crouch_anim, punch_anim, kick_anim;
     Vector2 speed;
-    float health, p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times, Jumpheight, crouchdepth, crouch_y;
+    float p_dmg, k_dmg, scale, groundY, keyframe, L_input_times, R_input_times, Jumpheight, crouchdepth, crouch_y;
     bool facingRight, is_punching, is_kicking, is_blocking, is_grounded, is_upright, is_moving, just_dashed, R_dash_allowed, L_dash_allowed, p_dmg_once, can_punch, k_dmg_once, can_kick;
 
     const float gravity= 1200.0f;
@@ -40,7 +40,8 @@ private:
 
 public:
 
-    bool R_move_allowed, L_move_allowed, R_dash, L_dash, can_block, is_alive, playpunchsfx, playkicksfx, playjumpsfx, playcrouchsfx;
+    float health;
+    bool R_move_allowed, L_move_allowed, R_dash, L_dash, can_block, is_alive, playpunchsfx, playkicksfx, playjumpsfx, playcrouchsfx, pausemove, blockbroken;
     char username[9] = {'P','l','a','y','e','r'};
     Vector2 position;
     

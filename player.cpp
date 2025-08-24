@@ -16,7 +16,7 @@ player::player(){
     facingRight = true;
     is_punching = 0, is_kicking = 0, is_blocking = 0, is_grounded = 0, is_upright = 0, is_moving = 0, just_dashed = 0, is_alive = 1;
     R_dash_allowed = 1, L_dash_allowed = 1, can_punch = 1, can_kick = 1, can_block = 1;
-    playpunchsfx = 0, playkicksfx = 0, playjumpsfx = 0, playcrouchsfx = 0;
+    playpunchsfx = 0, playkicksfx = 0, playjumpsfx = 0, playcrouchsfx = 0, pausemove = 0;
 }
 
 
@@ -132,7 +132,7 @@ void player::update(player &p2){
 is_alive = (health > 0) ? 1 : 0;
 if(health < 0){health = 0;}
 
-if(!is_alive){
+if(!is_alive || pausemove){
 
 L_move_allowed = 0; R_move_allowed = 0, R_dash_allowed = 0, L_dash_allowed = 0;
 can_block = 0, can_kick = 0, can_punch = 0;
@@ -155,7 +155,7 @@ can_block = 0, can_kick = 0, can_punch = 0;
     if(!can_kick && FCkick >= 60/8){
         FCkick = 0;
         CFkick++;
-        if(CFkick > 13){CFkick = 0; can_kick = 1; p2.can_block = 1;}
+        if(CFkick > 13){CFkick = 0; can_kick = 1; p2.can_block = 1; p2.blockbroken = 0;}
     }
 
 //Movement Frames
@@ -242,7 +242,7 @@ can_block = 0, can_kick = 0, can_punch = 0;
     if(IsKeyPressed(Kick) && is_grounded && is_upright && can_kick && !is_punching){is_kicking = 1; can_kick = 0; playkicksfx = 1;}
     if(is_kicking){
         R_dash_allowed = 0, L_dash_allowed = 0;
-        if(CheckCollisionRecs(k_hitbox,p2.l_hitbox) && !k_dmg_once && p2.is_upright){p2.health -= k_dmg; k_dmg_once =1; p2.can_block = 0;}
+        if(CheckCollisionRecs(k_hitbox,p2.l_hitbox) && !k_dmg_once && p2.is_upright){p2.health -= k_dmg; k_dmg_once =1; p2.can_block = 0; p2.blockbroken = 1;}
     }
 
     update_hitbox();
